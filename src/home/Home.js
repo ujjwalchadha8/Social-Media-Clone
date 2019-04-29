@@ -2,26 +2,22 @@ import React from 'react';
 import DataManager from '../DataManager';
 import Utils from '../_utils/Utils';
 
-class ViewProfile extends React.Component {
-    
+class Home extends React.Component {
+
     constructor(props) {
         super(props);
-        this.state = {
-            profile: null
-        };
         this.dataManager = new DataManager();
     }
 
-    componentDidMount() {
+    componentWillMount() {
         Utils.requireActiveSession(this);
     }
 
     render() {
         return (
-            <p>HELLO FROM PROFILE</p>
-        );
+            <h1>HOME</h1>
+        )
     }
-
 }
 
-export default ViewProfile;
+export default Home;

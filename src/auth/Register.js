@@ -2,11 +2,13 @@ import React from 'react';
 import $ from 'jquery/dist/jquery';
 
 import './Register.css'
+import DataManager from '../DataManager';
 
 class Register extends React.Component {
     
     constructor(props) {
-        super(props)
+        super(props);
+        this.dataManager = new DataManager();
         this.state = {
             usernameText: "",
             passwordText: "",
@@ -44,14 +46,9 @@ class Register extends React.Component {
             })
             return;
         }
-        $.post('http://localhost:4000/register', 
-         {
-             username: this.state.usernameText,
-             password: this.state.passwordText
-         }, (response) => {
+        this.dataManager.register(this.state.usernameText, this.state.passwordText, (response) => {
             console.log(response);
-            alert(response);
-        }).catch(error=> {
+        }, (error) => {
             switch(error.responseJSON.reason){
                 case "USER_TAKEN":
                     this.setState({

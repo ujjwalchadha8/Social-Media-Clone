@@ -1,6 +1,8 @@
 import React from 'react';
 import "./Login.css";
-import $ from 'jquery/dist/jquery';
+import DataManager from '../DataManager';
+import Utils from '../_utils/Utils';
+import API, { APP_URLS } from '../constants';
 
 class Login extends React.Component {
     
@@ -14,6 +16,11 @@ class Login extends React.Component {
         this.handleUsernameChange = this.handleUsernameChange.bind(this)
         this.handlePasswordChange = this.handlePasswordChange.bind(this)
         this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.dataManager = new DataManager();
+    }
+
+    componentDidMount() {
+        this.redirectUrl = new URL(window.location.href).searchParams.get('redirectUrl');
     }
 
     handleUsernameChange(event) {
@@ -29,25 +36,21 @@ class Login extends React.Component {
     }
 
     handleLoginClick() {
-        $.ajaxSetup({
-            crossDomain: true,
-            xhrFields: {
-                withCredentials: true
+        this.dataManager.login(this.state.usernameText, this.state.passwordText, (response) => {
+            if (this.redirectUrl) {
+                Utils.redirectTo(this, this.redirectUrl)
+            } else {
+                Utils.redirectTo(this, APP_URLS.HOME);
             }
-        });
-        $.post('http://localhost:4000/login', 
-         {
-             username: this.state.usernameText,
-             password: this.state.passwordText
-         }, (response) => {
-            console.log(response);
-        }).catch(error=> {
+        }, (error) => {
             switch(error.responseJSON.reason){
                 case "INVALID_USER":
                     this.setState({
                         errorText: "Invalid username and/or password."
                     })
                     break;
+                default:
+                    console.error(error);
             }
         })
     }
