@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery/dist/jquery';
 
 import './Register.css'
 import DataManager from '../DataManager';

@@ -6,7 +6,9 @@ const API = {
     GET_PROFILE: "/get-profile",
     CREATE_PROFILE: "/create-profile",
     UPDATE_PROFILE: "/update-profile",
-    GET_SESSION: "/session"
+    GET_SESSION: "/session",
+    GET_FEED_POSTS: "/get_post_content",
+    GET_POST_COMMENTS: "/get_comments",
 } 
 
 export const APP_URLS = {

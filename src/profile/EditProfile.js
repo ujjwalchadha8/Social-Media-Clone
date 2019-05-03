@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery/dist/jquery';
 
 class EditProfile extends React.Component {
     

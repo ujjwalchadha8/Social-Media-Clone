@@ -2,7 +2,7 @@ import React from 'react';
 import "./Login.css";
 import DataManager from '../DataManager';
 import Utils from '../_utils/Utils';
-import API, { APP_URLS } from '../constants';
+import { APP_URLS } from '../constants';
 
 class Login extends React.Component {
     

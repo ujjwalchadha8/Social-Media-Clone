@@ -28,8 +28,8 @@ class DataManager {
         $.post(API.BASE_URL + API.LOGOUT, successCallback).catch(errorCallback);
     }
 
-    getProfile(successCallback, errorCallback) {
-        $.get(API.BASE_URL + API.GET_PROFILE, null, (response) => {
+    getProfile(username, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_PROFILE, { username: username }, (response) => {
             successCallback(response)
         }).fail(error => {
             errorCallback(error)
@@ -50,6 +50,24 @@ class DataManager {
 
     getSession(successCallback, errorCallback) {
         $.get(API.BASE_URL + API.GET_SESSION, null, successCallback).catch(errorCallback)
+    }
+
+    getFeedPosts(fromTimestamp, toTimestamp, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_FEED_POSTS, {}, (response) => {
+            successCallback(response.body.posts[0]);                
+        }).catch((error) => {
+            errorCallback(error)
+        })
+    }
+
+    getPostComments(postId, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_POST_COMMENTS, {
+            postID: postId
+        }, (response) => {
+            successCallback(response);
+        }).catch((error) => {
+            errorCallback(error);
+        })
     }
 
 }
