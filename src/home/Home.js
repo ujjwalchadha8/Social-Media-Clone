@@ -3,8 +3,9 @@ import DataManager from '../DataManager';
 import Utils from '../_utils/Utils';
 import Navbar from '../navbar/navbar';
 import { Link } from "react-router-dom";
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import PostItem from '../PostList/PostItem';
+import AddPost from '../PostList/AddPost';
+import AddEvent from '../events/AddEvent';
 
 class Home extends React.Component {
 
@@ -14,6 +15,8 @@ class Home extends React.Component {
             posts: []
         }
         this.dataManager = new DataManager();
+        this.postModalHandlers = this.postModalHandlers.bind(this);
+        this.eventModalHandlers = this.eventModalHandlers.bind(this);
     }
 
     componentWillMount() {
@@ -27,55 +30,49 @@ class Home extends React.Component {
         })
     }
 
-    handleCommentsClick(pid, event) {
-        this.dataManager.getPostComments(pid, (response) => {
-            console.log(response);
-        }, (error) => {
-            console.log(error);
-        })
+    handleAddPostClick() {
+        this.openPostModal();
+    }
+
+    handleAddEventClick() {
+        this.openEventModal();
+    }
+
+    postModalHandlers(openModal, closeModal) {
+        this.openPostModal = openModal;
+        this.closePostModal = closeModal;
+        console.log('added post modal handlers')
+    }
+
+    eventModalHandlers(openModal, closeModal) {
+        this.openEventModal = openModal;
+        this.closeEventModal = closeModal;
+        console.log('added event modal handlers')
     }
 
     render() {
         let postListItems = this.state.posts.map((post) => {
             return (
                 <li key={post.PID} className="list-unstyled">
-                    <div className="offset-md-2 col-md-8 mt-4 mb-2">
-                        <div className="card">
-                            <div className="card-header">
-                                <strong>@{post.username}</strong>
-                                <span className="ml-3" hidden={!post.locationName}>
-                                    <FontAwesomeIcon icon="map-marker"></FontAwesomeIcon>
-                                    <span className="ml-1">{post.locationName}</span>
-                                </span>
-                                <span className="float-right">13 mins ago</span>
-                            </div>
-                            <div className="card-body">
-                                <h5 className="card-title">{post.displayname}</h5>
-                                <p className="card-text">{post.content_data}</p>
-                                <div >
-                                    <FontAwesomeIcon icon="thumbs-up" className="float-left"></FontAwesomeIcon>
-                                    <span className="ml-1">3 </span>
-                                    <span className="card-link d-flex justify-content-center text-primary cursor-pointer" 
-                                                onClick={this.handleCommentsClick.bind(this, post.PID)}>Comments</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <PostItem post={post}></PostItem>
                 </li>
             )
-        })
+        });
 
         return (
             <div>
                 <Navbar activeTab="home"/>
                 <div className="container below-navbar">
+                    <AddEvent modalHandlers={this.eventModalHandlers}></AddEvent>
+                    <AddPost modalHandlers={this.postModalHandlers}></AddPost>
                     <div className="jumbotron">
-                        <h1 className="display-4">Hello, world!</h1>
+                        <h1 className="display-4">New York University</h1>
                         <p className="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
                         <hr className="my-4"/>
                         <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
                         <p className="lead">
-                            <Link className="btn btn-primary btn-lg" to="/myprofile" role="button">Learn more</Link>
+                            <button onClick={this.handleAddPostClick.bind(this)} className="btn btn-primary btn-lg" role="button">Create a Post</button>
+                            <button onClick={this.handleAddEventClick.bind(this)} className="btn btn-success btn-lg ml-2" role="button">Create an Event</button>
                         </p>
                     </div>
                     <ul>{postListItems}</ul>

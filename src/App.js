@@ -13,9 +13,12 @@ import 'jquery'
 import 'bootstrap/dist/js/bootstrap';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faThumbsUp, faMapMarker} from '@fortawesome/free-solid-svg-icons'
+import { faThumbsUp, faMapMarker, faCalendar} from '@fortawesome/free-solid-svg-icons'
+import Events from './events/Events';
+import Groups from './groups/Groups';
+import GroupView from './groups/GroupView';
 
-library.add(faThumbsUp, faMapMarker)
+library.add(faThumbsUp, faMapMarker, faCalendar)
 
 class App extends Component {
 
@@ -30,9 +33,13 @@ class App extends Component {
             <Route path="/login" exact component={Login}/>
             <Route path="/logout" exact component={Logout}/>
             <Route path="/register" exact component={Register}/>
+            <Route path="/events" exact component={Events}/>
             <Route path="/myprofile" exact component={ViewProfile}/>
             <Route path="/profile/:username" exact component={ViewProfile}/>
+            <Route path="/profile/:username/:tabname" exact component={ViewProfile}/>
             <Route path="/mypofile/edit" exact component={EditProfile}/>
+            <Route path="/groups" exact component={Groups} />
+            <Route path="/groups/:groupid" exact component={GroupView}/>
           </Router>
         </header>
       </div>

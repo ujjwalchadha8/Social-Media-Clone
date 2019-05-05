@@ -13,7 +13,8 @@ class Navbar extends React.Component {
             HOME: "home",
             FRIENDS: "friends",
             GROUPS: "groups",
-            ACCOUNT: "account"
+            ACCOUNT: "account",
+            EVENTS: "events"
         }
     }
 
@@ -31,6 +32,9 @@ class Navbar extends React.Component {
                     <li className={"nav-item " + (activeTab === Navbar.tabs.GROUPS ? "active" : "")}>
                         <Link className="nav-link" to="/groups">Groups</Link>
                     </li>
+                    <li className={"nav-item " + (activeTab === Navbar.tabs.EVENTS ? "active" : "")}>
+                        <Link className="nav-link" to="/events">Events</Link>
+                    </li>
                     <li className={"nav-item " + (activeTab === Navbar.tabs.FRIENDS ? "active" : "")}>
                         <Link className="nav-link color-white" to="/link">Friends</Link>
                     </li>
@@ -42,7 +46,7 @@ class Navbar extends React.Component {
                         <Link className="dropdown-item" to="/myprofile">View Profile</Link>
                         <Link className="dropdown-item" to="/">Edit Profile</Link>
                         <div className="dropdown-divider"></div>
-                        <a className="dropdown-item" href="/">Logout</a>
+                        <a className="dropdown-item" href="/logout">Logout</a>
                         </div>
                     </li>
                     </ul>
