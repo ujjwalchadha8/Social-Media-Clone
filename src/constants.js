@@ -15,7 +15,9 @@ const API = {
     SEARCH_LOCATION: "/search_location",
     ADD_POST: "/add_post",
     ADD_POST_CONTENT: "/add_post_content",
-    ADD_EVENT: "/add_event"
+    ADD_EVENT: "/add_event",
+	GET_DIRECT_FRIENDS: "/get_direct_friends",
+	SEARCH_GROUPS: "/search_groups",
 } 
 
 export const APP_URLS = {

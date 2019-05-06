@@ -17,6 +17,7 @@ import { faThumbsUp, faMapMarker, faCalendar} from '@fortawesome/free-solid-svg-
 import Events from './events/Events';
 import Groups from './groups/Groups';
 import GroupView from './groups/GroupView';
+import friends from './friends/friends';
 
 library.add(faThumbsUp, faMapMarker, faCalendar)
 
@@ -40,6 +41,7 @@ class App extends Component {
             <Route path="/mypofile/edit" exact component={EditProfile}/>
             <Route path="/groups" exact component={Groups} />
             <Route path="/groups/:groupid" exact component={GroupView}/>
+			<Route path="/friends" exact component={friends}/>
           </Router>
         </header>
       </div>

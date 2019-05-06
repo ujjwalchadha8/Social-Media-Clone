@@ -157,7 +157,24 @@ class DataManager {
     }
 
     searchUserGroups(searchText, successCallback, errorCallback) {
+		$.get(API.BASE_URL + API.SEARCH_GROUPS, {
+            title: searchText
+        }, (response) => {
+			console.log(response.body.events[0]);
+            successCallback(response.body.events[0]);
+        }).catch(error => {
+            errorCallback(error);
+        })
         
+    }
+	
+	getDirectFriends(successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_DIRECT_FRIENDS, null, (response) => {
+			console.log(response.body.events[0]);
+            successCallback(response.body.events[0]);
+        }).catch(error => {
+            errorCallback(error);
+        })
     }
 
 }

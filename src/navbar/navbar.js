@@ -36,7 +36,7 @@ class Navbar extends React.Component {
                         <Link className="nav-link" to="/events">Events</Link>
                     </li>
                     <li className={"nav-item " + (activeTab === Navbar.tabs.FRIENDS ? "active" : "")}>
-                        <Link className="nav-link color-white" to="/link">Friends</Link>
+                        <Link className="nav-link color-white" to="/friends">Friends</Link>
                     </li>
                     <li className={"nav-item dropdown " + (activeTab === Navbar.tabs.ACCOUNT ? "active" : "")}>
                         <a className="nav-link dropdown-toggle" href="/" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
