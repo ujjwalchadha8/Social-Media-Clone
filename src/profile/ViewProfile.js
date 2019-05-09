@@ -6,7 +6,8 @@ import './ViewProfile.css'
 import ProfileItem from './ProfileItem';
 import { Link } from "react-router-dom";
 import { ProfileRelation } from '../constants';
-
+import PostItem from '../PostList/PostItem'
+import FriendItem from '../friends/GroupItem'
 
 class ViewProfile extends React.Component {
     
@@ -15,6 +16,8 @@ class ViewProfile extends React.Component {
         this.state = {
             profile: null,
             error: null,
+            posts: [],
+            friends: []
         };
         this.dataManager = new DataManager();
     }
@@ -25,10 +28,24 @@ class ViewProfile extends React.Component {
         if (this.props.match.params.username) {
             username = this.props.match.params.username;
         }
-        this.dataManager.getProfile(username, (response) => {
+        this.dataManager.getProfile(username, (profile) => {
             this.setState({
-                profile: response.body.profile,
-                profileType: username ? 'OTHER': 'ME'
+                profile: profile
+            });
+            this.dataManager.getPostsBy(profile.uid, (posts) => {
+                console.log(posts);
+                this.setState({
+                    posts: posts
+                })
+            }, error => {
+                console.error(error);
+            });
+            this.dataManager.getDirectFriends(profile.uid, (friends) => {
+                this.setState({
+                    friends: friends
+                })
+            }, error => {
+                console.error(error);
             })
         }, (error) => {
             console.error(error);
@@ -44,7 +61,8 @@ class ViewProfile extends React.Component {
                     })
                     break;
             }
-        })
+        });
+        
     }
 
     getTabName() {
@@ -67,6 +85,20 @@ class ViewProfile extends React.Component {
             )
         }
         let activeTab = this.getTabName();
+        let postListItems = this.state.posts.map((post) => {
+            return (
+                <li key={post.PID} className="list-unstyled">
+                    <PostItem post={post}></PostItem>
+                </li>
+            )
+        });
+        let friendListItems = this.state.friends.map((friend) => {
+            return (
+                <li key={friend.friend_id} className="list-unstyled">
+                    <FriendItem friend={friend}></FriendItem>
+                </li>
+            )
+        });
         return (
             <div>
                 <Navbar activeTab="account"/>
@@ -81,16 +113,22 @@ class ViewProfile extends React.Component {
                                         <Link className={"nav-link " + (activeTab === 'posts' ? 'active' : '')} 
                                                 to={"/profile/"+this.state.profile.username+"/posts"}>Posts</Link>
                                     </li>
-                                    <li className="nav-item">
+                                    {/* <li className="nav-item">
                                         <Link className={"nav-link " + (activeTab === 'events' ? 'active' : '')} 
                                                 to={"/profile/"+this.state.profile.username+"/events"}>Events</Link>
-                                    </li>
+                                    </li> */}
                                     <li className="nav-item">
                                         <Link className={"nav-link " + (activeTab === 'friends' ? 'active' : '')} 
                                             to={"/profile/"+this.state.profile.username+"/friends"}>Friends</Link>
                                     </li>
                                 </ul>
                             </div>
+                        </div>
+                        <div hidden={activeTab !== 'posts'}>
+                            <div>{postListItems}</div>
+                        </div>
+                        <div hidden={activeTab !== 'friends'}>
+                            {friendListItems}
                         </div>
                     </div>
                     

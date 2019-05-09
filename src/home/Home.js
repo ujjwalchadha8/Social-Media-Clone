@@ -2,7 +2,6 @@ import React from 'react';
 import DataManager from '../DataManager';
 import Utils from '../_utils/Utils';
 import Navbar from '../navbar/navbar';
-import { Link } from "react-router-dom";
 import PostItem from '../PostList/PostItem';
 import AddPost from '../PostList/AddPost';
 import AddEvent from '../events/AddEvent';
@@ -19,7 +18,7 @@ class Home extends React.Component {
         this.eventModalHandlers = this.eventModalHandlers.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         Utils.requireActiveSession(this);
         this.dataManager.getFeedPosts(null, null, (posts)=>{
             this.setState({
@@ -27,7 +26,7 @@ class Home extends React.Component {
             })
         }, (error) =>{
             console.error(error);
-        })
+        });
     }
 
     handleAddPostClick() {

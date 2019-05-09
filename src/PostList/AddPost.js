@@ -13,10 +13,12 @@ class AddPost extends FormComponent {
             postTitle: "",
             postContent: "",
             postRestrictionId: 0,
-            postLocationId: null,
+            postLocationId: -1,
             postLocationText: "",
-            errorText: ""
+            errorText: "",
+            photo: null,
         }
+        this.photoInput = React.createRef();
         this.props.modalHandlers(this.openModal, this.closeModal);
         this.dataManager = new DataManager();
     }
@@ -30,7 +32,7 @@ class AddPost extends FormComponent {
 
         }, (error) => {
             console.error(error);
-        })
+        });
     }
 
     openModal() {
@@ -45,7 +47,7 @@ class AddPost extends FormComponent {
         this.setState({
             postRestrictionId: event.target.value
         });
-        setTimeout(()=> console.log(this.state), 500);
+        setTimeout(() => console.log(this.state), 500);
     }
 
     handleFormTextChange(event) {
@@ -67,7 +69,7 @@ class AddPost extends FormComponent {
                         })
                     } else {
                         this.setState({
-                            postLocationId: null
+                            postLocationId: -1
                         })
                     }
                 });
@@ -75,15 +77,17 @@ class AddPost extends FormComponent {
         }
     }
 
-    handleSubmit() {
-        if (this.validateCurrentPost()) {
-            this.dataManager.addNewPost(this.state.postTitle, this.state.postContent, 
-                                            this.state.postLocationId, this.state.postRestrictionId, (response) => {
-                console.log(response);
-                this.closeModal()
-            }, (error) => {
-                console.error(error);
-            })  
+    handleSubmit(e) {
+        console.log(this.state);
+        if (!this.validateCurrentPost()) {
+            // this.dataManager.addNewPost(this.state.postTitle, this.state.postContent, 
+            //                                 this.state.postLocationId, this.state.postRestrictionId, (response) => {
+            //     console.log(response);
+            //     this.closeModal()
+            // }, (error) => {
+            //     console.error(error);
+            // }) 
+            e.preventDefault();
         }
     }
 
@@ -135,55 +139,81 @@ class AddPost extends FormComponent {
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
                     <div className="modal-body mx-3">
-                        <div className="md-form mb-5">
+                        
+
+                        {/* <div className="md-form mb-5">
                         <i className="fas fa-user prefix grey-text"></i>
-                        <label data-error="wrong" data-success="right" htmlFor="form34">Post Title</label>
-                        <input type="text" id="form34" className="form-control validate"
+                        <label data-error="wrong" data-success="right" htmlFor="form34">Post Photo</label>
+                        <input type="file" id="form34" className="form-control validate"
                                 name="postTitle"
-                                value={this.state.postTitle}
-                                onChange={this.handleFormTextChange}/>
-                        </div>
+                                ref={this.photoInput}
+                                />
+                        </div> */}
+
+                        <form ref='uploadForm' 
+                            id='uploadForm' 
+                            action='http://localhost:4000/upload-post' 
+                            onSubmit={this.handleSubmit.bind(this)}
+                            method='post' 
+                            encType="multipart/form-data">
+                                <div className="md-form mb-3">
+                                <i className="fas fa-user prefix grey-text"></i>
+                                <label data-error="wrong" data-success="right" htmlFor="form34">Post Title</label>
+                                <input type="text" id="form34" className="form-control validate"
+                                        name="postTitle"
+                                        value={this.state.postTitle}
+                                        onChange={this.handleFormTextChange}/>
+                                </div>
 
 
-                        <div className="md-form mb-5">
-                        <i className="fas fa-envelope prefix grey-text"></i>
-                        <label data-error="wrong" data-success="right" htmlFor="form29">Privacy</label>
-                        {/* <input type="email" id="form29" className="form-control validate"/> */}
-                        <select className="form-control" 
-                            onChange={this.handleRestrictionChange.bind(this)}
-                            value={this.state.postRestrictionId}>
-                            {postRestrictionsList}
-                        </select>
-                        </div>
+                                <div className="md-form mb-3">
+                                <i className="fas fa-envelope prefix grey-text"></i>
+                                <label data-error="wrong" data-success="right" htmlFor="form29">Privacy</label>
+                                {/* <input type="email" id="form29" className="form-control validate"/> */}
+                                <select className="form-control" 
+                                    name="restriction"
+                                    onChange={this.handleRestrictionChange.bind(this)}
+                                    value={this.state.postRestrictionId}>
+                                    {postRestrictionsList}
+                                </select>
+                                </div>
 
-                        <div className="md-form mb-5">
-                        <i className="fas fa-tag prefix grey-text"></i>
-                        <label data-error="wrong" data-success="right" htmlFor="form32">Location</label>
-                        <input type="text" id="form32" 
-                                className="form-control validate"
-                                name="postLocationText" 
-                                value={this.state.postLocationText}
-                                onChange={this.handleFormTextChange} list="addPostLocationDataList"/>
-                        <datalist id="addPostLocationDataList">
-                            {postLocationDataList}
-                        </datalist>
-                        </div>
+                                <div className="md-form mb-3">
+                                <i className="fas fa-tag prefix grey-text"></i>
+                                <label data-error="wrong" data-success="right" htmlFor="form32">Location</label>
+                                <input type="text" id="form32" 
+                                        className="form-control validate"
+                                        name="postLocationText" 
+                                        value={this.state.postLocationText}
+                                        onChange={this.handleFormTextChange} list="addPostLocationDataList"/>
+                                <datalist id="addPostLocationDataList">
+                                    {postLocationDataList}
+                                </datalist>
+                                </div>
 
-                        <div className="md-form">
-                        <i className="fas fa-pencil prefix grey-text"></i>
-                        <label data-error="wrong" data-success="right" htmlFor="form8">Post Content</label>
-                        <textarea type="text" id="form8" 
-                            className="md-textarea form-control" rows="4"
-                            value={this.state.postContent}
-                            name="postContent"
-                            onChange={this.handleFormTextChange}></textarea>
-                        </div>
+                                <div className="md-form mb-3">
+                                <i className="fas fa-pencil prefix grey-text"></i>
+                                <label data-error="wrong" data-success="right" htmlFor="form8">Post Content</label>
+                                <textarea type="text" id="form8" 
+                                    className="md-textarea form-control" rows="4"
+                                    value={this.state.postContent}
+                                    name="postContent"
+                                    onChange={this.handleFormTextChange}></textarea>
+                                </div>
+                                <input type="file" name="sampleFile" />
+
+                                <input type="hidden" name="postLocationId" value={this.state.postLocationId} />
+                                <input type="hidden" name="postRestrictionId" value={this.state.postRestrictionId} />
+                                <input type='submit' value='Submit' />
+                        </form> 
+
                         <p className="mt-3 text-danger">{this.state.errorText}</p>
                     </div>
-                    <div className="modal-footer d-flex justify-content-center">
-                        <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}>Add <i className="ml-1"></i></button>
-                    </div>
+                    {/* <div className="modal-footer d-flex justify-content-center">
+                        <input valie="Submit" type='submit' className="btn btn-success" onClick={this.handleSubmit.bind(this)}></input>
+                    </div> */}
                     </div>
                 </div>
             </div>

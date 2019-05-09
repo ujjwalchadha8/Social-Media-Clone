@@ -38,10 +38,10 @@ class App extends Component {
             <Route path="/myprofile" exact component={ViewProfile}/>
             <Route path="/profile/:username" exact component={ViewProfile}/>
             <Route path="/profile/:username/:tabname" exact component={ViewProfile}/>
-            <Route path="/mypofile/edit" exact component={EditProfile}/>
+            <Route path="/myprofile/edit" exact component={EditProfile}/>
             <Route path="/groups" exact component={Groups} />
             <Route path="/groups/:groupid" exact component={GroupView}/>
-			<Route path="/friends" exact component={friends}/>
+			      <Route path="/friends" exact component={friends}/>
           </Router>
         </header>
       </div>

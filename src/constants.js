@@ -17,7 +17,16 @@ const API = {
     ADD_POST_CONTENT: "/add_post_content",
     ADD_EVENT: "/add_event",
 	GET_DIRECT_FRIENDS: "/get_direct_friends",
-	SEARCH_GROUPS: "/search_groups",
+    SEARCH_GROUPS: "/search_groups",
+    GET_USER_POSTS: "/get_posts_user",
+    ADD_COMMENT: "/add_comment",
+    GET_LIKE_COUNT: "/get_like_count",
+    ADD_LIKE: "/add_like",
+    GET_GROUP_POSTS: "/get_group_posts",
+    GET_GROUP_DETAILS: "/get_group_details",
+    SEARCH_FRIENDS: "/search_friends",
+    SEND_FRIEND_REQUEST: "/send_request",
+    ACCEPT_FRIEND_REQUEST: "/accept_request",
 } 
 
 export const APP_URLS = {

@@ -3,6 +3,7 @@ import "./Login.css";
 import DataManager from '../DataManager';
 import Utils from '../_utils/Utils';
 import { APP_URLS } from '../constants';
+import { Link } from "react-router-dom";
 
 class Login extends React.Component {
     
@@ -84,7 +85,7 @@ class Login extends React.Component {
                                     Login
                                 </button>
                                 <p className="text-center mt-2"> or </p>
-                                <button className="btn btn-danger fill-width">Register</button>
+                                <Link className="btn btn-danger fill-width" to="/register">Sign Up!</Link>
                                 <p>{this.state.errorText}</p>
                             </div>
                         </div>

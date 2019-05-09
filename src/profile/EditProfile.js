@@ -1,77 +1,132 @@
 import React from 'react';
+import FormComponent from '../_utils/FormComponent';
+import DataManager from '../DataManager';
+import Utils from '../_utils/Utils';
+import Navbar from '../navbar/navbar'
 
-class EditProfile extends React.Component {
+class EditProfile extends FormComponent {
     
     constructor(props) {
         super(props)
         this.state = {
-            usernameText: "",
-            passwordText: "",
-            errorText: ""
+            nameText: "",
+            emailText: "",
+            genderText: "",
+            ageText: "",
+            cityText: "",
+            errorText: "",
+            isNewProfile: true
         };
-        this.handleTextChange = this.handleTextChange.bind(this);
+        this.dataManager = new DataManager();
     }
 
-    handleTextChange(event) {
-        let newState = {};
-        newState[event.target.name] = event.target.value;
-        this.setState(newState)
+    componentDidMount() {
+        Utils.requireActiveSession(this);
+        this.dataManager.getProfile(null, (profile) => {
+            if (profile) {
+                this.setState({
+                    nameText: profile.displayName,
+                    emailText: profile.email,
+                    genderText: profile.gender,
+                    ageText: profile.age,
+                    cityText: profile.city,
+                    isNewProfile: false
+                })
+            } else {
+                this.setState({
+                    isNewProfile: false
+                })
+            }
+        }, error => {
+            Utils.requireActiveSession(this);
+            console.error(error);
+        })
     }
 
-    handleLoginClick() {
-        console.log(this.state)
-        // $.post('http://localhost:4000/login', 
-        //  {
-        //      username: this.state.usernameText,
-        //      password: this.state.passwordText
-        //  }, (response) => {
-        //     console.log(response);
-        //     alert(response);
-        // }).catch(error=> {
-        //     switch(error.responseJSON.reason){
-        //         case "INVALID_USER":
-        //             this.setState({
-        //                 errorText: "Invalid username and/or password."
-        //             })
-        //             break;
-        //     }
-        // })
+    handleSubmit() {
+        if (this.state.isNewProfile) {
+            this.dataManager.createProfile(this.state.nameText, this.state.emailText, this.state.genderText, this.state.ageText, this.state.cityText,
+                (response) => {
+                    
+                    Utils.redirectTo(this, "/home");
+                }, error => {
+                    console.error(error);
+                    this.setState({
+                        errorText: JSON.stringify(error)
+                    })
+                })
+        } else {
+            this.dataManager.updateProfile(this.state.nameText, this.state.emailText, this.state.genderText, this.state.ageText, this.state.cityText,
+                (response) => {
+                    alert("Profile successfully updated");
+                    Utils.redirectTo(this, "/home");
+                }, error => {
+                    console.error(error);
+                    this.setState({
+                        errorText: JSON.stringify(error)
+                    })
+                })
+        }
     }
     
     render() {
         return (
-            <div className="container">
+            <div>
+            <Navbar/>
+            <div className="container below-navbar">
                 <div className="row mt-5">
                     <div className="col-md-4"></div>
                     <div className="col-md-4">
+                        <h4>{this.state.isNewProfile ? "Create " : "Edit"} your profile</h4>
                         <div className="panel">
                             <div className="panel-body">
                                 <input  
-                                    name="usernameText"
-                                    value={this.state.usernameText}
-                                    onChange={this.handleTextChange}
+                                    name="nameText"
+                                    value={this.state.nameText}
+                                    onChange={this.handleFormTextChange}
                                     className="form form-control" 
                                     type="text" 
-                                    placeholder="username"/>
+                                    placeholder="name"/>
                                 <input 
-                                    name="passwordText"
-                                    value={this.state.passwordText}
-                                    onChange={this.handleTextChange}
+                                    name="emailText"
+                                    value={this.state.emailText}
+                                    onChange={this.handleFormTextChange}
                                     className="form form-control mt-2" 
-                                    type="password" 
-                                    placeholder="password"/>
+                                    type="email" 
+                                    placeholder="email"/>
+                                <input 
+                                    name="genderText"
+                                    value={this.state.genderText}
+                                    onChange={this.handleFormTextChange}
+                                    className="form form-control mt-2" 
+                                    type="text" 
+                                    placeholder="gender"/>
+                                <input 
+                                    name="ageText"
+                                    value={this.state.ageText}
+                                    onChange={this.handleFormTextChange}
+                                    className="form form-control mt-2" 
+                                    type="number" 
+                                    placeholder="age"/>
+                                <input 
+                                    name="cityText"
+                                    value={this.state.cityText}
+                                    onChange={this.handleFormTextChange}
+                                    className="form form-control mt-2" 
+                                    type="text" 
+                                    placeholder="city"/>
                                 <button 
                                     className="btn btn-primary mt-4 fill-width"
-                                    onClick={()=>this.handleLoginClick()}>
-                                    Login
+                                    onClick={()=>this.handleSubmit()}>
+                                    Submit
                                 </button>
-                                <p className="text-center mt-2"> or </p>
-                                <button className="btn btn-danger fill-width">Register</button>
+                                
                                 <p>{this.state.errorText}</p>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         )
     } 

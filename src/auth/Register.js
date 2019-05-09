@@ -2,6 +2,7 @@ import React from 'react';
 
 import './Register.css'
 import DataManager from '../DataManager';
+import Utils from '../_utils/Utils';
 
 class Register extends React.Component {
     
@@ -46,7 +47,7 @@ class Register extends React.Component {
             return;
         }
         this.dataManager.register(this.state.usernameText, this.state.passwordText, (response) => {
-            console.log(response);
+            Utils.redirectTo(this, "/login");
         }, (error) => {
             switch(error.responseJSON.reason){
                 case "USER_TAKEN":

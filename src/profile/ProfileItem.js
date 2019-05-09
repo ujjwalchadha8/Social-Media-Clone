@@ -2,6 +2,7 @@ import React from 'react';
 import emptyDp from '../_resources/empty_dp.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ProfileRelation } from '../constants';
+import DataManager from '../DataManager';
 
 class ProfileItem extends React.Component {
 
@@ -10,6 +11,35 @@ class ProfileItem extends React.Component {
         this.state = {
             profile: this.props.profile,
         }
+        this.dataManager = new DataManager();
+    }
+
+    handleSendFriendRequest() {
+        this.dataManager.sendFriendrequest(this.state.profile.uid, (response) => {
+            let newProfile = JSON.parse(JSON.stringify(this.state.profile));
+            newProfile.data.relation = ProfileRelation.REQUESTED
+            this.setState({
+                profile: newProfile
+            })
+        }, error => {
+            console.error(error);
+        })
+    }
+
+    handleAcceptFriendRequest () {
+        this.dataManager.acceptFriendRequest(this.state.profile.uid, (response) => {
+            let newProfile = JSON.parse(JSON.stringify(this.state.profile));
+            newProfile.data.relation = ProfileRelation.FRIENDS
+            this.setState({
+                profile: newProfile
+            })
+        }, error => {
+            console.error(error);
+        })
+    }
+
+    handleRemoveFriend() {
+
     }
 
     render() {
@@ -36,19 +66,23 @@ class ProfileItem extends React.Component {
                                 {/* <!-- Split button --> */}
                                 <div hidden={profile.data.relation === ProfileRelation.ME}>
                                     <button type="button" className="btn btn-primary" 
-                                        hidden={profile.data.relation !== ProfileRelation.UNKNOWN}>
+                                        hidden={profile.data.relation !== ProfileRelation.UNKNOWN}
+                                        onClick={this.handleSendFriendRequest.bind(this)}>
                                         Connect
                                     </button>
                                     <button type="button" className="btn btn-primary" 
-                                        hidden={profile.data.relation !== ProfileRelation.REQUESTED}>
+                                        hidden={profile.data.relation !== ProfileRelation.REQUESTED}
+                                        onClick={this.handleRemoveFriend.bind(this)}>
                                         Requested
                                     </button>
                                     <button type="button" className="btn btn-primary" 
-                                        hidden={profile.data.relation !== ProfileRelation.RECEIVED}>
+                                        hidden={profile.data.relation !== ProfileRelation.RECEIVED}
+                                        onClick={this.handleAcceptFriendRequest.bind(this)}>
                                         Accept Friend Request
                                     </button>
                                     <button type="button" className="btn btn-primary" 
-                                        hidden={profile.data.relation !== ProfileRelation.FRIENDS}>
+                                        hidden={profile.data.relation !== ProfileRelation.FRIENDS}
+                                        onClick={this.handleRemoveFriend.bind(this)}>
                                         Friends
                                     </button>
                                 </div>

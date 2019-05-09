@@ -30,7 +30,7 @@ class DataManager {
 
     getProfile(username, successCallback, errorCallback) {
         $.get(API.BASE_URL + API.GET_PROFILE, { username: username }, (response) => {
-            successCallback(response)
+            successCallback(response.body.profile)
         }).fail(error => {
             errorCallback(error)
         });
@@ -48,30 +48,87 @@ class DataManager {
         });
     }
 
+    createProfile(name, email, gender, age, city, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.CREATE_PROFILE, {
+            displayName: name, 
+            email: email,
+            gender: gender,
+            age: age,
+            city: city,
+        }, response => {
+            successCallback(response);
+        }).catch(errorCallback);
+    }
+
+    updateProfile(name, email, gender, age, city, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.UPDATE_PROFILE, {
+            displayName: name, 
+            email: email,
+            gender: gender,
+            age: age,
+            city: city,
+        }, response => {
+            successCallback(response);
+        }).catch(errorCallback);
+    }
+
     getSession(successCallback, errorCallback) {
         $.get(API.BASE_URL + API.GET_SESSION, null, successCallback).catch(errorCallback)
     }
 
     getFeedPosts(fromTimestamp, toTimestamp, successCallback, errorCallback) {
         $.get(API.BASE_URL + API.GET_FEED_POSTS, {}, (response) => {
+            response.body.posts[0].sort((post1, post2) => {
+                return (new Date(post2.time) - new Date(post1.time))
+            });
             successCallback(response.body.posts[0]);                
         }).catch((error) => {
             errorCallback(error)
         })
     }
 
+    getPostsBy(uid, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_USER_POSTS, {
+            userID: uid
+        }, (response) => {
+            response.body.posts[0].sort((post1, post2) => {
+                return (new Date(post2.time) - new Date(post1.time))
+            });
+            successCallback(response.body.posts[0]);
+        }).catch(errorCallback);
+    }
+
+    getGroupPosts(gid, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.GET_GROUP_POSTS, {
+            groupID: gid
+        }, response => {
+            if (!response.body[0]) {
+                successCallback([]);
+                return;
+            }
+            response.body[0].sort((post1, post2) => {
+                return (new Date(post2.time) - new Date(post1.time))
+            });
+            successCallback(response.body[0]);
+        }).catch(errorCallback);
+    }
+
     getPostComments(postId, successCallback, errorCallback) {
         $.get(API.BASE_URL + API.GET_POST_COMMENTS, {
             postID: postId
         }, (response) => {
-            successCallback(response);
+            successCallback(response.body[0]);
         }).catch((error) => {
             errorCallback(error);
         })
     }
 
-    getPostsBy(uid, successCallback, errorCallback) {
-        
+    getPostLikes(postId, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_LIKE_COUNT, {
+            postID: postId
+        }, (response) => {
+            successCallback(response.body.posts[0].likecount);
+        }).catch(errorCallback);
     }
 
     getAllEvents(successCallback, errorCallback) {
@@ -96,8 +153,16 @@ class DataManager {
         })
     }
 
+    getGroupDetails(gid, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_GROUP_DETAILS, {
+            groupID: gid
+        }, response => {
+            successCallback(response.body.events[0]);
+        }).catch(errorCallback);
+    }
+
     searchLocations(searchText, successCallback, errorCallback) {
-        $.post(API.BASE_URL + API.SEARCH_LOCATION, {
+        $.get(API.BASE_URL + API.SEARCH_LOCATION, {
             locationName: searchText
         }, response => {
             successCallback(response.body);
@@ -127,7 +192,7 @@ class DataManager {
             locationID: postLocationId,
             restrictionID: postRestrictionId
         }, (response) => {
-            let postId = response.body.insertId;
+            let postId = response.body[0].ID;
             $.post(API.BASE_URL + API.ADD_POST_CONTENT, {
                 PostID: postId,
                 type: 'text',
@@ -135,6 +200,23 @@ class DataManager {
             }, response => {
                 successCallback(response)
             }).catch(errorCallback);
+        }).catch(errorCallback);
+    }
+
+    addNewComment(postId, commentText, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.ADD_COMMENT, {
+            postID: postId,
+            commentText: commentText
+        }, response => {
+            successCallback(response);
+        }).catch(errorCallback);
+    }
+
+    addLike(postId, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.ADD_LIKE, {
+            postID: postId
+        }, response => {
+            successCallback(response);
         }).catch(errorCallback);
     }
 
@@ -168,13 +250,49 @@ class DataManager {
         
     }
 	
-	getDirectFriends(successCallback, errorCallback) {
-        $.get(API.BASE_URL + API.GET_DIRECT_FRIENDS, null, (response) => {
+	getDirectFriends(uid, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_DIRECT_FRIENDS, {
+            userID: uid
+        }, (response) => {
 			console.log(response.body.events[0]);
             successCallback(response.body.events[0]);
         }).catch(error => {
             errorCallback(error);
         })
+    }
+
+    searchUsers(search, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.SEARCH_FRIENDS, {
+            username: search
+        }, response => {
+            successCallback(response.body);
+        }).catch(errorCallback);
+    }
+
+    sendFriendrequest(uid, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.SEND_FRIEND_REQUEST, {
+            friendID: uid
+        }, response => {
+            successCallback(response);
+        }).catch(error => errorCallback);
+    }
+
+    acceptFriendRequest(uid, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.ACCEPT_FRIEND_REQUEST, {
+            friendID: uid
+        }, response => {
+            successCallback(response);
+        }).catch(error => errorCallback);
+    }
+
+    removeFriend(uid, successCallback, errorCallback) {
+
+    }
+
+    getFriendRequests(successCallback, errorCallback) {
+        $.get(API.BASE_URL + '/get_friends_status_requests', null, (response) => {
+            successCallback(response.body.events[0]);
+        }).catch(errorCallback)
     }
 
 }

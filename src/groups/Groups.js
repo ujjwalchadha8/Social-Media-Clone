@@ -19,52 +19,63 @@ class Groups extends React.Component {
     componentDidMount() {
         Utils.requireActiveSession(this);
         this.dataManager.getUserGroups((groups)=>{
-            console.log(groups);
             groups.forEach(group => {
-                group.isJoined = true
+                group.isJoined = true;
+                group.isVisible = true;
             });
-            let newGroups = this.state.groups.slice();
-            newGroups.push(...groups);
-            this.setState({
-                groups: newGroups
-            })
+            console.log(groups);
+            this.addToStateGroups(groups);
         }, error => {
             console.error(error);
         });
         this.dataManager.getNewGroups((groups)=>{
-            console.log(groups);
             groups.forEach(group => {
-                group.isJoined = false
+                group.isJoined = false;
+                group.isVisible = true;
             });
-            let newGroups = this.state.groups.slice();
-            newGroups.push(...groups);
-            this.setState({
-                groups: newGroups
-            })
+            console.log(groups);
+            this.addToStateGroups(groups);
         }, error => {
             console.error(error);
         });
     }
 
+    addToStateGroups(groups) {
+        let newGroups = this.state.groups.slice();
+        newGroups.push(...groups);
+        this.setState({
+            groups: newGroups
+        })
+    }
+
     handleSearchTextChange(event) {
         let search = event.target.value;
-        this.setState({
-            searchText: search
-        })
         this.dataManager.searchUserGroups(search, (groups) =>{
-
             this.setState({
-                groups: groups
+                groupList: groups
             }, error =>{
                 console.error(error);
             })
+        })
+
+        let newGroups = this.state.groups.slice();
+        newGroups.forEach(group => {
+            if (group.Title.toLowerCase().includes(search.toLowerCase()) || search === "") {
+                group.isVisible = true;
+            } else {
+                group.isVisible = false;
+            }
+        });
+        this.setState({
+            searchText: search,
+            groups: newGroups
         })
     }
 
     render() {
         let groupListItems = this.state.groups.map((group) => {
             return (
-                <li key={group.GID} className="list-unstyled">
+                <li key={group.GID} className="list-unstyled mt-3" hidden={!group.isVisible}>
                     <GroupItem group={group}></GroupItem>
                 </li>
             )

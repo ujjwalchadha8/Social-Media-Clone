@@ -1,6 +1,6 @@
 import React from 'react'
 import DataManager from '../DataManager';
-import GroupItem from './GroupItem';
+import FriendItem from './GroupItem';
 import Navbar from '../navbar/navbar';
 import Utils from '../_utils/Utils';
 // import { Link } from "react-router-dom";
@@ -18,19 +18,23 @@ class Friends extends React.Component {
 
     componentDidMount() {
         Utils.requireActiveSession(this);
-        this.dataManager.getDirectFriends((groups)=>{
-            console.log(groups);
-            groups.forEach(group => {
-                group.isJoined = true
-            });
-            let newGroups = this.state.groups.slice();
-            newGroups.push(...groups);
+        this.dataManager.getDirectFriends(null, (groups)=>{
             this.setState({
-                groups: newGroups
+                groups: groups
             })
         }, error => {
             console.error(error);
         });
+        this.dataManager.getFriendRequests(friends => {
+            console.log('HI', friends);
+            let newFriends = friends
+            newFriends.push(...this.state.groups.slice());
+            
+            this.setState({
+                groups: newFriends
+            })
+            console.log(newFriends);
+        })
         
     }
 
@@ -39,21 +43,13 @@ class Friends extends React.Component {
         this.setState({
             searchText: search
         })
-        this.dataManager.searchUserGroups(search, (groups) =>{
-
-            this.setState({
-                groups: groups
-            }, error =>{
-                console.error(error);
-            })
-        })
     }
 
     render() {
-        let groupListItems = this.state.groups.map((group) => {
+        let friendListItems = this.state.groups.map((group) => {
             return (
                 <li key={group.friend_id} className="list-unstyled">
-                    <GroupItem group={group}></GroupItem>
+                    <FriendItem friend={group}></FriendItem>
                 </li>
             )
         })
@@ -63,12 +59,8 @@ class Friends extends React.Component {
                 <Navbar activeTab="groups"/>
                 <div className="container below-navbar">
                     <div className="form">
-                        <input type="text" className="form-control ml-4" 
-                            value={this.state.searchText}
-                            onChange={this.handleSearchTextChange.bind(this)}></input>
-                        
                     </div>
-                    <ul className="mt-3">{groupListItems}</ul>
+                    <ul className="mt-3">{friendListItems}</ul>
                 </div>
             </div>
         )
