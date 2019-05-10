@@ -49,7 +49,7 @@ class Navbar extends React.Component {
         let userListHtml = this.state.userList.map(user => {
             console.log(user);
             return (
-                <option key={user.UID} value={user.uid}>{user.username}</option>
+                <option key={user.friend_id} value={user.username}>@{user.username}</option>
             )
         });
         return (

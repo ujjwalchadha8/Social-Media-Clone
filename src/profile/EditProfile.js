@@ -43,9 +43,48 @@ class EditProfile extends FormComponent {
         })
     }
 
+    validateProfile() {
+        if (!this.state.nameText) {
+            this.setState({
+                errorText: "Name cannot be empty"
+            })
+            return false;
+        } else if (!this.state.emailText || !this.isEmailValid(this.state.emailText)) {
+            this.setState({
+                errorText: "Invalid email"
+            })
+            return false;
+        } else if (!this.state.genderText || !["male", "female"].includes(this.state.genderText.toLowerCase())) {
+            this.setState({
+                errorText: "Gender must be one of 'male' or 'female'"
+            })
+            return false;
+        } else if (!this.state.ageText || parseInt(this.state.ageText) < 18 || parseInt(this.state.ageText) > 100) {
+            this.setState({
+                errorText: "Age must be between 18 and 100"
+            })
+            return false;
+        } else if (!this.state.cityText) {
+            this.setState({
+                errorText: "City cannot be empty"
+            })
+            return false;
+        }
+        return true;
+    }
+
+    isEmailValid(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
+
     handleSubmit() {
+        if (!this.validateProfile()) {
+            return;
+        }
+        
         if (this.state.isNewProfile) {
-            this.dataManager.createProfile(this.state.nameText, this.state.emailText, this.state.genderText, this.state.ageText, this.state.cityText,
+            this.dataManager.createProfile(this.state.nameText, this.state.emailText, this.state.genderText.toLowerCase(), this.state.ageText, this.state.cityText,
                 (response) => {
                     
                     Utils.redirectTo(this, "/home");
@@ -56,7 +95,7 @@ class EditProfile extends FormComponent {
                     })
                 })
         } else {
-            this.dataManager.updateProfile(this.state.nameText, this.state.emailText, this.state.genderText, this.state.ageText, this.state.cityText,
+            this.dataManager.updateProfile(this.state.nameText, this.state.emailText, this.state.genderText.toLowerCase(), this.state.ageText, this.state.cityText,
                 (response) => {
                     alert("Profile successfully updated");
                     Utils.redirectTo(this, "/home");

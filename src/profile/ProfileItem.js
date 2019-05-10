@@ -39,7 +39,15 @@ class ProfileItem extends React.Component {
     }
 
     handleRemoveFriend() {
-
+        this.dataManager.removeFriend(this.state.profile.uid, (response) => {
+            let newProfile = JSON.parse(JSON.stringify(this.state.profile));
+            newProfile.data.relation = ProfileRelation.UNKNOWN;
+            this.setState({
+                profile: newProfile
+            })
+        }, error => {
+            console.error(error);
+        })
     }
 
     render() {

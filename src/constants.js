@@ -21,12 +21,16 @@ const API = {
     GET_USER_POSTS: "/get_posts_user",
     ADD_COMMENT: "/add_comment",
     GET_LIKE_COUNT: "/get_like_count",
+    GET_LIKED_USERS: "/get_users_like_post",
     ADD_LIKE: "/add_like",
+    REMOVE_LIKE: "/delete_like",
     GET_GROUP_POSTS: "/get_group_posts",
     GET_GROUP_DETAILS: "/get_group_details",
     SEARCH_FRIENDS: "/search_friends",
     SEND_FRIEND_REQUEST: "/send_request",
     ACCEPT_FRIEND_REQUEST: "/accept_request",
+    REMOVE_FRIEND: "/block_request",
+    GET_TIMELINE: "/get_timeline"
 } 
 
 export const APP_URLS = {

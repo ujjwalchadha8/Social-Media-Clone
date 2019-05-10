@@ -14,7 +14,24 @@ class GroupItem extends React.Component {
 
     handleJoinClick() {
         this.dataManager.joinGroup(this.state.group.GID, (response) => {
-            
+            let group = this.state.group;
+            group.isJoined = true
+            this.setState({ 
+                group: group
+            })
+        }, (error) => {
+            console.error(error)
+        })
+    }
+
+    handleUnjoinClick() {
+        this.dataManager.removeGroup(this.state.group.GID, (response) => {
+            let group = this.state.group;
+            group.isJoined = false
+            console.log(response)
+            this.setState({ 
+                group: group
+            })
         }, (error) => {
             console.error(error)
         })
@@ -34,7 +51,9 @@ class GroupItem extends React.Component {
                             <button className="btn btn-primary float-right" 
                                 onClick={this.handleJoinClick.bind(this)}
                                 hidden={group.isJoined}>Join</button>
-                            <button className="btn btn-info float-right" hidden={!group.isJoined}>Joined</button>
+                            <button className="btn btn-info float-right" 
+                                onClick={this.handleUnjoinClick.bind(this)}
+                                hidden={!group.isJoined}>Joined</button>
                         </div>
                     </div>
                 </div>

@@ -17,7 +17,10 @@ class ViewProfile extends React.Component {
             profile: null,
             error: null,
             posts: [],
-            friends: []
+            friends: [],
+            timeline: [],
+            myFeedPosts: [],
+            timelinePostVisible: {}
         };
         this.dataManager = new DataManager();
     }
@@ -33,7 +36,6 @@ class ViewProfile extends React.Component {
                 profile: profile
             });
             this.dataManager.getPostsBy(profile.uid, (posts) => {
-                console.log(posts);
                 this.setState({
                     posts: posts
                 })
@@ -46,7 +48,20 @@ class ViewProfile extends React.Component {
                 })
             }, error => {
                 console.error(error);
-            })
+            });
+            this.dataManager.getTimeline(profile.uid, (timeline) => {
+                console.log(timeline)
+                this.setState({
+                    timeline: timeline
+                })
+            }, error => {
+                console.error(error);
+            });
+            this.dataManager.getFeedPosts(null, null, (posts) => {
+                this.setState({
+                    myFeedPosts: posts
+                })
+            }, error => console.error(error))
         }, (error) => {
             console.error(error);
             switch(error.responseJSON.reason) {
@@ -62,11 +77,23 @@ class ViewProfile extends React.Component {
                     break;
             }
         });
-        
     }
 
     getTabName() {
         return this.props.match.params.tabname ? this.props.match.params.tabname : 'posts';
+    }
+
+    getPostForId(postId) {
+        for (let post in this.state.posts) {
+            if (this.state.posts[post].PID == postId) {
+                return this.state.posts[post];
+            }
+        }
+        for (let post in this.state.myFeedPosts) {
+            if (this.state.myFeedPosts[post].PID == postId) {
+                return this.state.myFeedPosts[post];
+            }
+        }
     }
 
     render() {
@@ -99,13 +126,37 @@ class ViewProfile extends React.Component {
                 </li>
             )
         });
+        let timelineItems = this.state.timeline.map((timelineItem) => {
+            return (
+                <li key={timelineItem.fakeId} className="list-unstyled" hidden={!this.getPostForId(timelineItem.eventId)}>
+                     <div className="card bg-light mt-3">
+                        <div className="card-body">
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <strong>
+                                    {timelineItem.eventType == 'add_like' ? "Liked a post" : 
+                                        timelineItem.eventType == 'add_comment' ? "Commented on a post" : 
+                                        timelineItem.eventType == 'upload_post' ? "Added a post" : ""} 
+                                    </strong>
+                                    <div className="float-right"
+                                    //  hidden={!this.state.timelinePostVisible[timelineItem.fakeId]}
+                                     >
+                                        {Utils.getAgoTimestamp(new Date(timelineItem.timestamp))}                        
+                                    </div>
+                                    {this.getPostForId(timelineItem.eventId) && <PostItem post={this.getPostForId(timelineItem.eventId)}/>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            )
+        });
         return (
             <div>
                 <Navbar activeTab="account"/>
                 <div className="below-navbar">
                      <div className="container">
                         <ProfileItem profile={this.state.profile}></ProfileItem>
-                        
                         <div hidden={this.state.profile.data.relation === ProfileRelation.BLOCKED}>
                             <div className="offset-md-1 col-md-10 mt-4">
                                 <ul className="nav nav-tabs">
@@ -113,10 +164,10 @@ class ViewProfile extends React.Component {
                                         <Link className={"nav-link " + (activeTab === 'posts' ? 'active' : '')} 
                                                 to={"/profile/"+this.state.profile.username+"/posts"}>Posts</Link>
                                     </li>
-                                    {/* <li className="nav-item">
-                                        <Link className={"nav-link " + (activeTab === 'events' ? 'active' : '')} 
-                                                to={"/profile/"+this.state.profile.username+"/events"}>Events</Link>
-                                    </li> */}
+                                    <li className="nav-item">
+                                        <Link className={"nav-link " + (activeTab === 'timeline' ? 'active' : '')} 
+                                                to={"/profile/"+this.state.profile.username+"/timeline"}>Timeline</Link>
+                                    </li>
                                     <li className="nav-item">
                                         <Link className={"nav-link " + (activeTab === 'friends' ? 'active' : '')} 
                                             to={"/profile/"+this.state.profile.username+"/friends"}>Friends</Link>
@@ -129,6 +180,9 @@ class ViewProfile extends React.Component {
                         </div>
                         <div hidden={activeTab !== 'friends'}>
                             {friendListItems}
+                        </div>
+                        <div hidden={activeTab !== 'timeline'}>
+                            {timelineItems}
                         </div>
                     </div>
                     

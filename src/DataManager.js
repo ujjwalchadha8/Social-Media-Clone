@@ -91,6 +91,7 @@ class DataManager {
         $.get(API.BASE_URL + API.GET_USER_POSTS, {
             userID: uid
         }, (response) => {
+            console.log(response);
             response.body.posts[0].sort((post1, post2) => {
                 return (new Date(post2.time) - new Date(post1.time))
             });
@@ -124,10 +125,18 @@ class DataManager {
     }
 
     getPostLikes(postId, successCallback, errorCallback) {
-        $.get(API.BASE_URL + API.GET_LIKE_COUNT, {
+        $.get(API.BASE_URL + API.GET_LIKED_USERS, {
             postID: postId
         }, (response) => {
-            successCallback(response.body.posts[0].likecount);
+            successCallback(response.body);
+        }).catch(errorCallback);
+    }
+
+    removeLike(postId, successCallback, errorCallback) {
+        $.post(API.BASE_URL + API.REMOVE_LIKE, {
+            postID: postId
+        }, (response) => {
+            successCallback(response.body);
         }).catch(errorCallback);
     }
 
@@ -172,18 +181,31 @@ class DataManager {
     }
 
     getAvailableRestrictions(successCallback, errorCallback) {
-        successCallback([
-            {
-                restrictionId: 1,
-                name : 'Public',
-            }, {
-                restrictionId: 2,
-                name : 'Friends'
-            }, {
-                restrictionId: 3,
-                name: 'Friends of friends'
-            }
-        ])
+        this.getUserGroups((groups)=> {
+            let restrictions = [
+                {
+                    restrictionId: 1,
+                    name : 'Public',
+                    type:'restriction'
+                }, {
+                    restrictionId: 2,
+                    name : 'Private',
+                    type:'restriction'
+                }, {
+                    restrictionId: 3,
+                    name: 'Friends of friends',
+                    type:'restriction'
+                }
+            ]
+            groups.forEach(group => {
+                restrictions.push({
+                    restrictionId: group.GID,
+                    name: group.Title,
+                    type:'group'
+                })
+            });
+            successCallback(restrictions)
+        }, errorCallback);
     }
 
     addNewPost(postTitle, postContent, postLocationId, postRestrictionId, successCallback, errorCallback) {
@@ -242,7 +264,6 @@ class DataManager {
 		$.get(API.BASE_URL + API.SEARCH_GROUPS, {
             title: searchText
         }, (response) => {
-			console.log(response.body.events[0]);
             successCallback(response.body.events[0]);
         }).catch(error => {
             errorCallback(error);
@@ -254,7 +275,6 @@ class DataManager {
         $.get(API.BASE_URL + API.GET_DIRECT_FRIENDS, {
             userID: uid
         }, (response) => {
-			console.log(response.body.events[0]);
             successCallback(response.body.events[0]);
         }).catch(error => {
             errorCallback(error);
@@ -286,13 +306,42 @@ class DataManager {
     }
 
     removeFriend(uid, successCallback, errorCallback) {
-
+        $.post(API.BASE_URL + API.REMOVE_FRIEND, {
+            friendID: uid
+        }, response => {
+            successCallback(response);
+        }).catch(error => errorCallback);
     }
 
     getFriendRequests(successCallback, errorCallback) {
         $.get(API.BASE_URL + '/get_friends_status_requests', null, (response) => {
             successCallback(response.body.events[0]);
         }).catch(errorCallback)
+    }
+
+    getTimeline(uid, successCallback, errorCallback) {
+        $.get(API.BASE_URL + API.GET_TIMELINE, {
+            uid: uid
+        }, (response) => {
+            let timeline = response.body;
+            let count = 100;
+            timeline.forEach(activity => {
+                activity.fakeId = count++;
+            })
+            successCallback(timeline);
+        }).catch(errorCallback);
+    }
+
+    joinGroup(gid, successCallback, errorCallback) {
+        $.post(API.BASE_URL + '/subscribe_to_group', {
+            GroupID: gid
+        }, successCallback).catch(errorCallback);
+    }
+
+    removeGroup(gid, successCallback, errorCallback) {
+        $.post(API.BASE_URL + '/unsubscribe_group', {
+            groupID: gid
+        }, successCallback).catch(errorCallback);
     }
 
 }

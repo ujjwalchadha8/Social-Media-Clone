@@ -19,6 +19,7 @@ class GroupView extends React.Component {
     componentDidMount() {
         Utils.requireActiveSession(this);
         this.dataManager.getGroupPosts(this.props.match.params.groupid, (posts)=>{
+            console.log(posts)
             this.setState({
                 posts: posts
             })

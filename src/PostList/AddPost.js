@@ -13,6 +13,7 @@ class AddPost extends FormComponent {
             postTitle: "",
             postContent: "",
             postRestrictionId: 0,
+            postGroupId: -1,
             postLocationId: -1,
             postLocationText: "",
             errorText: "",
@@ -44,8 +45,10 @@ class AddPost extends FormComponent {
     }
 
     handleRestrictionChange(event) {
+        let id = event.target.value;
         this.setState({
-            postRestrictionId: event.target.value
+            postRestrictionId: id <=3 ? id : -1,
+            postGroupId: id > 3 ? id : -1,
         });
         setTimeout(() => console.log(this.state), 500);
     }
@@ -56,22 +59,18 @@ class AddPost extends FormComponent {
             case "postLocationText":
                 let text = event.target.value;
                 this.dataManager.searchLocations(text, (locations) => {
+                    let locationId = -1;
+                    locations.forEach(availableLocation => {
+                        if (text.toLowerCase() === availableLocation.name.toLowerCase()) {
+                            locationId = availableLocation.LID
+                        }
+                    });
                     this.setState({
+                        postLocationId: locationId,
                         availableLocations: locations
                     })
                 }, error => {
                     this.state.errorText = JSON.stringify(error)
-                });
-                this.state.availableLocations.forEach(availableLocation => {
-                    if (text === availableLocation.name) {
-                        this.setState({
-                            postLocationId: availableLocation.LID
-                        })
-                    } else {
-                        this.setState({
-                            postLocationId: -1
-                        })
-                    }
                 });
                 break;
         }
@@ -102,7 +101,7 @@ class AddPost extends FormComponent {
                 errorText: 'Post content cannot be empty'
             })
             return false;
-        } else if (!this.state.postLocationId) {
+        } else if (!this.state.postLocationId || this.state.postLocationId === -1) {
             this.setState({
                 errorText: 'Select a valid location'
             })
@@ -125,7 +124,8 @@ class AddPost extends FormComponent {
         });
         let postRestrictionsList = this.state.availableRestrictions.map(restriction => {
             return (
-                <option key={restriction.restrictionId} value={restriction.restrictionId}>{restriction.name}</option>
+                <option key={restriction.restrictionId}
+                         value={restriction.restrictionId}>{restriction.name}</option>
             )
         })
         return (
@@ -175,7 +175,7 @@ class AddPost extends FormComponent {
                                 <select className="form-control" 
                                     name="restriction"
                                     onChange={this.handleRestrictionChange.bind(this)}
-                                    value={this.state.postRestrictionId}>
+                                    value={this.state.postRestrictionId == -1 ? this.state.postGroupId : this.state.postRestrictionId}>
                                     {postRestrictionsList}
                                 </select>
                                 </div>
@@ -206,6 +206,7 @@ class AddPost extends FormComponent {
 
                                 <input type="hidden" name="postLocationId" value={this.state.postLocationId} />
                                 <input type="hidden" name="postRestrictionId" value={this.state.postRestrictionId} />
+                                <input type="hidden" name="postGroupId" value={this.state.postGroupId}></input>
                                 <input type='submit' value='Submit' />
                         </form> 
 

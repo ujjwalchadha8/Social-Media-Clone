@@ -15,13 +15,14 @@ class PostItem extends FormComponent {
             likeCount: 0,
             commentText: "",
             comments: [],
-            errorText: "",
+            errorText: ""
         }
         this.dataManager = new DataManager();
     }
 
-    componentDidMount() {
+    componentDidMount() {        
         this.reload();
+        // console.log(this.props.post);
     }
 
     reload() {
@@ -30,12 +31,14 @@ class PostItem extends FormComponent {
                 commentText: "",
                 comments: comments
             })
-            this.dataManager.getPostLikes(this.props.post.PID, (likeCount) => {
-                console.log('LIKES: ', likeCount);
+            this.dataManager.getPostLikes(this.props.post.PID, (userLikes) => {
                 this.setState({
-                    likeCount: likeCount
+                    likeCount: userLikes.users.length,
+                    isLiked: userLikes.isLiked
                 })
+
             })
+
         }, (error) => {
             console.log(error);
             Utils.activateSession(this);
@@ -58,15 +61,30 @@ class PostItem extends FormComponent {
         })
     }
 
+
+
     handleLikeClick() {
-        this.dataManager.addLike(this.props.post.PID, (response) => {
-            this.setState({
-                isLiked: true,
-                likeCount: this.state.likeCount + 1
+        if (!this.state.isLiked) {
+            this.dataManager.addLike(this.props.post.PID, (response) => {
+                this.setState({
+                    isLiked: true,
+                    likeCount: this.state.likeCount + 1
+                })
+            }, error => {
+                console.error(error);
+                Utils.requireActiveSession(this);
             })
-        }, error => {
-            console.error(error);
-        })
+        } else {
+            this.dataManager.removeLike(this.props.post.PID, (response) => {
+                this.setState({
+                    isLiked: false,
+                    likeCount: this.state.likeCount - 1
+                })
+            }, error => {
+                console.error(error);
+                Utils.requireActiveSession(this);
+            })
+        }
     }
 
     render() {
@@ -89,16 +107,15 @@ class PostItem extends FormComponent {
                                 <FontAwesomeIcon icon="map-marker"></FontAwesomeIcon>
                                 <span className="ml-1">{post.locationName}</span>
                             </span>
-                            <span className="float-right">{Utils.getAgoTimestamp(new Date(post.time))}</span>
+                            <span className="float-right">{Utils.getAgoTimestamp(new Date(post.time ? post.time : post.timestamp))} ago</span>
                         </div>
                         <div className="card-body">
                             <h5 className="card-title">{post.title}</h5>
                             <p className="card-text">{post.content_data}</p>
                             <div className="container">
                                 {/* DISPLAY IMAGE HERE */}
-                                <img className="mb-4 mr-2 image-contained" 
-                                    
-                                    src={"https://www.gstatic.com/webp/gallery/1.jpg"}></img>
+                                <img className="mb-4 mr-2 image-contained" accept="image/*"
+                                    src={post.photo ? "http://localhost:4000/image?imagePath="+post.PID : ""}></img>
                             </div>
                             <div className="input-group">
                                 <input className="form-control" type="text"
